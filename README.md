@@ -2,7 +2,7 @@
 
 
 ---
-#Parts
+# Parts
 
 - ESP32
 - SCD41
