@@ -1,5 +1,18 @@
 void setup() {
-  // put your setup code here, to run once:
+ 
+// Display
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+
+// LEDs
+
+#define CO2_LED D5
+#define RH_LED D6
+
+// Treshold
+
+#define CO2_th 1000
+# define RH_th 60
 
 }
 
