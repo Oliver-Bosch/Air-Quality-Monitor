@@ -1,6 +1,6 @@
 # Air-Quality-Monitor
 
-This is a guide to build your own Air-Quality-Monitor (**AQM**). The AQM continuously tracks essential environmental parameters, measuring CO2, particulate matter, temperature, and relative humidity to help you maintain a healthy living space. All real-time data is clearly visualized on a vibrant 4-inch TFT display and simultaneously saved onto an onboard SD card for long-term tracking. The system is fully Wi-Fi enabled for seamless network integration and features a built-in visual alert system: two dedicated LEDs will immediately notify you if either the CO2 concentration or the humidity levels become too high.
+This is a guide to build your own Air-Quality-Monitor (**AQM**). The AQM measures CO2, relative humidity, temperature, and particulate matter. The current readings are displayed on a 4-inch TFT screen and continuously logged to an onboard SD card. The device is connected to the local network via Wi-Fi. Additionally, it features two LED indicators that function as visual alarms, which trigger when predefined maximum thresholds for either CO2 or humidity are exceeded.
 
 
 ---
