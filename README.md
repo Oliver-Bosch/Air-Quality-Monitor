@@ -5,10 +5,10 @@
 # Parts
 
 - ESP32S
-- SCD41
-- SHT40 
-- SPS30
-- VEML7700
+- SCD41 CO₂ Sensor
+- SHT40 Temperature & Humidity Sensor
+- SPS30 Particulate Matter Sensor
+- VEML7700 Ambient Light Sensor
 - ILI9488 4 Inch
 - 2x $$200 \Omega$$ Resistor
 - Red LED
@@ -27,6 +27,8 @@
 ---
 # Price
 
+<div align="center">
+
 | Bauteil | Preis |
 |----------|--------|
 | ESP32S | 3,42 € |
@@ -41,5 +43,5 @@
 |----------|--------|
 | Total | 50,18 € |
 
-\* All parts sourced on Aliexpress 
+\* All parts sourced on Aliexpress 2026
 
