@@ -19,14 +19,12 @@ This is a guide to build your own Air-Quality-Monitor (**AQM**). The AQM measure
 
 # Assembly
 
-
+Soldering
 
 
 # How does it work?
 
 # Display Layout
-
-
 
 
 # Price
