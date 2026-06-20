@@ -3,7 +3,7 @@
 This is a guide to build your own Air-Quality-Monitor (**AQM**). The AQM measures CO2, relative humidity, temperature, and particulate matter. The current readings are displayed on a 4-inch TFT screen and continuously logged to an onboard SD card. The device is connected to the local network via Wi-Fi. Additionally, it features two LED indicators that function as visual alarms, which trigger when predefined maximum thresholds for either CO2 or humidity are exceeded. The alerts and display are also controlled via a ambient light sensor to toggle them at night.
 
 
----
+
 # Parts
 
 - ESP32S
@@ -16,21 +16,19 @@ This is a guide to build your own Air-Quality-Monitor (**AQM**). The AQM measure
 - Red LED
 - Blue LED
 
----
+
 # Assembly
 
 
 
----
+
 # How does it work?
 
----
 # Display Layout
 
 
 
 
----
 # Price
 
 <div align="center">
