@@ -12,9 +12,9 @@ This is a guide to build your own Air-Quality-Monitor (**AQM**). The AQM measure
 - SPS30 Particulate Matter Sensor
 - VEML7700 Ambient Light Sensor
 - ILI9488 4 Inch TFT Display
-- 2x $$200 \Omega$$ Resistor
-- Red LED
-- Blue LED
+- 3x $$200 \Omega$$ Resistor
+- Red, Blue and Yellow LED
+
 
 
 # Assembly
@@ -37,11 +37,11 @@ Soldering
 | SCD41  | 17,99 € |
 | SHT40  | 2,79 € |
 | SPS30  | 10,45 € |
-
 | VEML7700 | 1,66 € |
 | ILI9488 4" TFT Display | 13,52 € |
-| 2× 200 Ω Resistor | 0,1 € |
+| 3× 200 Ω Resistor | 0,15 € |
 | Red LED | 0,1 € |
+| Yellow LED| 0,1€ |
 | Blue LED | 0,15 € |
 | **Total** | **50.18 €** |
 
