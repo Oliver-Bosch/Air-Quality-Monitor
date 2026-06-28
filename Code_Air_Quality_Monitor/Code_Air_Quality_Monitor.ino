@@ -1,134 +1,151 @@
 #include <Arduino.h>
-#include <Wire.h>
-#include <ESP8266WiFi.h>
+#include <WiFi.h>
+#include <WiFiUdp.h>
 #include <NTPClient.h>
-#include <WiFiUDP.h>
-#include <SensirionI2cScd4x.h>
-#include <SensirionI2cSht4x.h>
-#include <Adafruit_SSD1306.h>
-#include <cmath>
 
-// Settings
-#define LED_ALERTS True // Toggles the CO_2 & RH alert LEDs | True: On
-#define Oriantation 1 // 0: Vertical; 1: Horizontal
-#define UpdateTime 500 // Delay between each refresh/measurement in ms
+// Eigene Module
+#include "config.h"
+#include "wifi_data.h"
+#include "daten.h"
+#include "sensor.h"
+#include "display.h"
+#include "espnow.h"
 
-// WLAN
-#define WIFI_SSID "X"
-#define WIFI_PASS "X" 
-
-
-// Display
-#define SCREEN_WIDTH 320
-#define SCREEN_HEIGHT 240
-
-
-// Pins
-#define CO2_al_LED D5
-#define CO2_cr_LED D6
-#define RH_LED D7
-
-
-// Tresholds (CO_2: ppm, RH: %, pmX: µg/m³, tvoc: µg/m³)
-#define CO2_th_alert 1000 
-#define CO2_th_critical 1500
-
-#define RH_th 60
-
-#define pm25_th_alert 15
-#define pm25_th_critical 25
-
-#define pm10_th_alert 20 
-#define pm10_th_critical 50
-
-#define tvoc_th_alert 300
-#define tvoc_th_critical 600
-
-
-// NTP
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "pool.ntp.org", 7200); // UTC+2 (Deutschland)
+NTPClient timeClient(ntpUDP, "pool.ntp.org", 7200); // UTC+2
+SensorDaten aktuelleDaten;
 
+static unsigned long letzteZeitSync = 0;
 
-double calculateDewPoint(double temperatureC, double relativeHumidity) {
-    
-    // Temperature in °C
-    // Relativ humidity in % 
-    // Dew point in °C
+// ==========================================
+// HILFSFUNKTIONEN
+// ==========================================
+void updateLEDs(const SensorDaten &daten) {
+    if (!LED_ALERTS) return;
 
-    constexpr double a = 17.62;
-    constexpr double b = 243.12; // °C
-
-    double gamma = std::log(relativeHumidity / 100.0) +
-                   (a * temperatureC) / (b + temperatureC);
-
-    double dewPoint = (b * gamma) / (a - gamma);
-
-    return dewPoint;
+    if (daten.co2 >= CO2_th_critical) {
+        digitalWrite(CO2_CR_LED, HIGH);
+        digitalWrite(CO2_AL_LED, LOW);
+    } else if (daten.co2 >= CO2_th_alert) {
+        digitalWrite(CO2_AL_LED, HIGH);
+        digitalWrite(CO2_CR_LED, LOW);
+    } else {
+        digitalWrite(CO2_AL_LED, LOW);
+        digitalWrite(CO2_CR_LED, LOW);
+    }
+    digitalWrite(RH_LED, daten.humSht >= RH_th_critical ? HIGH : LOW);
 }
 
-double calculateAbsoluteHumidity(double temperatureC, double relativeHumidity)
-{
-    // Saturation vapour pressure nach Magnus (hPa)
-    double saturationVaporPressure = 6.112 * std::exp((17.67 * temperatureC) / (temperatureC + 243.5));
+void formatTimeAndDate(char* timeBuf, char* dateBuf) {
+    unsigned long epoch = timeClient.getEpochTime();
 
-    // Actual saturtion vapour pressure (hPa)
-    double vaporPressure = saturationVaporPressure * (relativeHumidity / 100.0);
+    int h = (epoch % 86400L) / 3600;
+    int m = (epoch % 3600) / 60;
+    sprintf(timeBuf, "%02d:%02d", h, m);
 
-    // Absolute humidity (g/m³)
-    double absoluteHumidity = 216.7 * vaporPressure / (temperatureC + 273.15);
+    const char* daysDE[] = {"So","Mo","Di","Mi","Do","Fr","Sa"};
+    const char* daysEN[] = {"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
+    int wd = timeClient.getDay();
+    const char* dayStr = strcmp(LANGUAGE, "GER") == 0 ? daysDE[wd] : daysEN[wd];
 
-    return absoluteHumidity;
+    unsigned long days = epoch / 86400L;
+    int year = 1970;
+    while (true) {
+        bool leap = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+        unsigned int diy = leap ? 366 : 365;
+        if (days < diy) break;
+        days -= diy;
+        year++;
+    }
+    int monthDays[] = {31,28,31,30,31,30,31,31,30,31,30,31};
+    if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) monthDays[1] = 29;
+    int month = 0;
+    while (days >= (unsigned long)monthDays[month]) { days -= monthDays[month]; month++; }
+    sprintf(dateBuf, "%s %02d.%02d.", dayStr, (int)days + 1, month + 1);
 }
 
+// NTP sync: kurz verbinden, Zeit holen, wieder trennen
+void syncZeit() {
+    Serial.println("NTP Sync...");
+    WiFi.begin(WIFI_SSID, WIFI_PASS);
+    int attempts = 0;
+    while (WiFi.status() != WL_CONNECTED && attempts < 20) {
+        delay(500);
+        Serial.print(".");
+        attempts++;
+    }
+    if (WiFi.status() == WL_CONNECTED) {
+        timeClient.begin();
+        timeClient.update();
+        Serial.println("\nZeit synchronisiert");
+    } else {
+        Serial.println("\nWLAN nicht erreichbar");
+    }
+    WiFi.disconnect();
+    delay(100);
+    // ESP-NOW nach WiFi-Disconnect neu initialisieren
+    initESPNow();
+    letzteZeitSync = millis();
+}
 
-
+// ==========================================
+// SETUP
+// ==========================================
 void setup() {
     Serial.begin(115200);
-    Wire.begin(D2, D1);
-    
-    pinMode(CO2_cr_LED, OUTPUT);
-    digitalWrite(CO2_cr_LED, LOW);
 
-    pinMode(CO2_al_LED, OUTPUT);
-    digitalWrite(CO2_al_LED, LOW);
+    // MAC Adresse ausgeben (vor allem anderen)
+    WiFi.mode(WIFI_STA);
+    delay(100);
+    Serial.print("MAC Adresse: ");
+    Serial.println(WiFi.macAddress());
 
-    pinMode(RH_LED, OUTPUT);
-    digitalWrite(RH_LED, LOW);
+    // LEDs & Backlight init
+    pinMode(TFT_BL_PIN, OUTPUT);
+    digitalWrite(TFT_BL_PIN, LOW);
+    pinMode(CO2_AL_LED, OUTPUT); digitalWrite(CO2_AL_LED, LOW);
+    pinMode(CO2_CR_LED, OUTPUT); digitalWrite(CO2_CR_LED, LOW);
+    pinMode(RH_LED,     OUTPUT); digitalWrite(RH_LED,     LOW);
+
+    // Display & Sensoren starten
+    initDisplay();
+    zeichneDashboardRaster();
+    initSensoren();
+
+    // Zeit holen und danach WiFi trennen
+    syncZeit();
 }
 
+// ==========================================
+// LOOP
+// ==========================================
 void loop() {
-  // put your main code here, to run repeatedly:
-
-
-
-
-
-
-
-
-
-
-
-    if(LED_ALERTS){
-
-        if (co2 >= CO2_th_alert && co2 < CO2_th_critical) {
-            digitalWrite(CO2_al_LED, HIGH);
-        } else if(co2 >= CO2_th_critical) {
-            digitalWrite(CO2_cr_LED, HIGH);
-        } else {
-            digitalWrite(CO2_al_LED, LOW);
-            digitalWrite(CO2_cr_LED, LOW);
-        }     
-
-        if (humSht >= RH_th) {
-            digitalWrite(RH_LED, HIGH);
-        } else {
-            digitalWrite(RH_LED, LOW);
-            }
-
+    // Alle 6 Stunden Zeit neu synchronisieren
+    if (millis() - letzteZeitSync > 21600000UL) {
+        syncZeit();
     }
 
+    static unsigned long letztesUpdate = 0;
 
+    if (millis() - letztesUpdate > UPDATE_TIME) {
+        letztesUpdate = millis();
 
+        leseSensoren(aktuelleDaten);
+
+        bool istDunkel = (aktuelleDaten.lux > LUX_TH_DARK && aktuelleDaten.co2 > 0);
+        digitalWrite(TFT_BL_PIN, istDunkel ? HIGH : LOW);
+        if (istDunkel) {
+            digitalWrite(CO2_AL_LED, LOW);
+            digitalWrite(CO2_CR_LED, LOW);
+            digitalWrite(RH_LED, LOW);
+        }
+
+        char timeBuf[10]; char dateBuf[14];
+        formatTimeAndDate(timeBuf, dateBuf);
+        updateTopBar(dateBuf, timeBuf, false, outdoorVerbunden()); // kein dauerhaftes WLAN mehr
+        updateSensorKacheln(aktuelleDaten);
+        updateUntererBereich(aktuelleDaten);
+        if (!istDunkel) updateLEDs(aktuelleDaten);
+    }
+    delay(10);
 }
