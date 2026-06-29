@@ -1,8 +1,8 @@
 # Air-Quality-Monitor
 
-This is a guide to build your own Air-Quality-Monitor (**AQM**). The AQM measures CO2, relative humidity, temperature, and particulate matter. The current readings are displayed on a 4-inch TFT screen and continuously logged to an onboard SD card. The device is connected to the local network via Wi-Fi. Additionally, it features three LED indicators that function as visual alarms, which trigger when predefined maximum thresholds for either CO2 or humidity are exceeded. The alerts and display are also controlled via a ambient light sensor to toggle them at night.
+This is a guide to build your own Air-Quality-Monitor (**AQM**). The AQM measures CO2, relative humidity, temperature, and particulate matter. The current readings are displayed on a 4-inch TFT screen and continuously logged to an onboard SD card. The device is connected to the local network via Wi-Fi to synchronise time. Additionally, it features three LED indicators that function as visual alarms, which trigger when predefined maximum thresholds for either CO2 or humidity are exceeded. The alerts and display are also controlled via a ambient light sensor to toggle them at night.
 
-
+When connected with the [AQM-Outdoor-Add-On](https://github.com/Oliver-Bosch/AQM-Outdoor-Add-On) a new tile will appear in the lower bar and give additional informations for the outside temperature, humidity and air pressure. With this information the ventilation logic and weather prediction is feed.
 
 # Parts
 
@@ -26,12 +26,15 @@ Soldering
 
 # Display Layout
 
+The AQM can either be used in a vertical or horizontal configuration. For that you can chgange ORIENTATION in the config file to either 0 (vertical) or 1 (horizontal).
+
+
 
 # Price
 
 <div align="center">
 
-| Bauteil | Preis |
+| Part | Price |
 |----------|--------|
 | ESP32S | 3,42 € |
 | SCD41  | 17,99 € |
