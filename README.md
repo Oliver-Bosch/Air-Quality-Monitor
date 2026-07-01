@@ -7,11 +7,11 @@ When connected with the [AQM-Outdoor-Add-On](https://github.com/Oliver-Bosch/AQM
 
 # Table of Contents
 
-- [Parts](# Parts)
-- [Assembly](# Assembly)
-- [Installation](# Installation)
-- [Price](# Price)
-- [Notes](# Notes)
+- [Parts](#parts)
+- [Assembly](#assembly)
+- [Installation](#installation)
+- [Price](#price)
+- [Notes](#notes)
 
 # Parts
 
