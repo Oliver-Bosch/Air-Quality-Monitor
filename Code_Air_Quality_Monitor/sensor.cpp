@@ -6,11 +6,14 @@
 #include <SensirionI2cSps30.h>
 #include <Adafruit_VEML7700.h>
 #include <cmath>
+#include "utils.h"
 
 #ifdef NO_ERROR
 #undef NO_ERROR
 #endif
 #define NO_ERROR 0
+static bool first = true;
+const float alpha = 0.3f;
 
 // ==========================================
 // SENSOR-OBJEKTE
@@ -23,19 +26,6 @@ Adafruit_VEML7700 veml = Adafruit_VEML7700();
 static bool vemlOK = false;
 static bool sps30OK = false;
 
-// ==========================================
-// HILFSFUNKTIONEN FÜR BERECHNUNGEN
-// ==========================================
-float calcDewPoint(float temp, float hum) {
-    float a = 17.271;
-    float b = 237.7;
-    float alpha = ((a * temp) / (b + temp)) + log(hum / 100.0);
-    return (b * alpha) / (a - alpha);
-}
-
-float calcAbsHumidity(float temp, float hum) {
-    return (6.112 * pow(2.71828, (17.67 * temp) / (temp + 243.5)) * hum * 2.1674) / (273.15 + temp);
-}
 
 // ==========================================
 // INITIALISIERUNG ALLER SENSOREN
@@ -63,7 +53,7 @@ void initSensoren() {
     sps30.begin(Wire, SPS30_I2C_ADDR_69);
     sps30.stopMeasurement();
     delay(50);
-    int16_t err = sps30.startMeasurement(SPS30_OUTPUT_FORMAT_OUTPUT_FORMAT_UINT16);
+    int16_t err = sps30.startMeasurement(SPS30_OUTPUT_FORMAT_OUTPUT_FORMAT_FLOAT);
     if (err != NO_ERROR) {
         Serial.println("SPS30 Start Fehler!");
         sps30OK = false;
@@ -100,16 +90,29 @@ bool leseSensoren(SensorDaten &daten) {
     // SPS30 ...
 
     if (sps30OK) {
-        uint16_t dataReadyFlag = 0;
-        sps30.readDataReadyFlag(dataReadyFlag);
-        if (dataReadyFlag) {
-            uint16_t mc1p0 = 0, mc2p5 = 0, mc4p0 = 0, mc10p0 = 0;
-            uint16_t nc0p5 = 0, nc1p0 = 0, nc2p5 = 0, nc4p0 = 0, nc10p0 = 0;
-            uint16_t typicalParticleSize = 0;
-            int16_t err = sps30.readMeasurementValuesUint16(mc1p0, mc2p5, mc4p0, mc10p0, nc0p5, nc1p0, nc2p5, nc4p0, nc10p0, typicalParticleSize);
-            if (err == NO_ERROR) {daten.pm10  = mc1p0  / 10.0f; daten.pm25  = mc2p5  / 10.0f; daten.pm100 = mc10p0 / 10.0f;}
+    uint16_t dataReadyFlag = 0;
+    sps30.readDataReadyFlag(dataReadyFlag);
+    if (dataReadyFlag) {
+        float mc1p0 = 0, mc2p5 = 0, mc4p0 = 0, mc10p0 = 0;
+        float nc0p5 = 0, nc1p0 = 0, nc2p5 = 0, nc4p0 = 0, nc10p0 = 0;
+        float typicalParticleSize = 0;
+        int16_t err = sps30.readMeasurementValuesFloat(mc1p0, mc2p5, mc4p0, mc10p0,
+                                                       nc0p5, nc1p0, nc2p5, nc4p0,
+                                                       nc10p0, typicalParticleSize);
+        if (err == NO_ERROR) {
+            if (first) {
+                daten.pm10  = mc1p0;
+                daten.pm25  = mc2p5;
+                daten.pm100 = mc10p0;
+                first = false;
+            } else {
+                daten.pm10  = alpha * mc1p0  + (1.0f - alpha) * daten.pm10;
+                daten.pm25  = alpha * mc2p5  + (1.0f - alpha) * daten.pm25;
+                daten.pm100 = alpha * mc10p0 + (1.0f - alpha) * daten.pm100;
             }
         }
+    }
+}
 
     // SCD41 nur wenn bereit
     bool dataReady = false;
@@ -118,14 +121,14 @@ bool leseSensoren(SensorDaten &daten) {
         scd4x.readMeasurement(daten.co2, daten.tempScd, daten.humScd);
     }
 
-    //Serial.println("==========Messwerte=============");
-    //Serial.print("Lux: ");    Serial.println(daten.lux);
-    //Serial.print("PM1.0: ");  Serial.println(daten.pm10);
-    //Serial.print("PM2.5: ");  Serial.println(daten.pm25);
-    //Serial.print("PM10: ");   Serial.println(daten.pm100);
-    //Serial.print("CO2: ");    Serial.println(daten.co2);
-    //Serial.print("Temp: ");   Serial.println(daten.tempSht);
-    //Serial.print("RH: ");     Serial.println(daten.humSht);    
+    Serial.println("==========Messwerte=============");
+    Serial.print("Lux: ");    Serial.println(daten.lux);
+    Serial.print("PM1.0: ");  Serial.println(daten.pm10);
+    Serial.print("PM2.5: ");  Serial.println(daten.pm25);
+    Serial.print("PM10: ");   Serial.println(daten.pm100);
+    Serial.print("CO2: ");    Serial.println(daten.co2);
+    Serial.print("Temp: ");   Serial.print(daten.tempSht); Serial.print(" | "); Serial.println(daten.tempScd);
+    Serial.print("RH: ");     Serial.print(daten.humSht); Serial.print(" | "); Serial.println(daten.humScd);
 
 
     return true; // immer true → Display updated immer

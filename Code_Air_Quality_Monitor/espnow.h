@@ -1,5 +1,6 @@
 #pragma once
 #include <Arduino.h>
+#include "config.h"
 
 struct OutdoorDaten {
     float temp     = 0.0;
@@ -11,4 +12,4 @@ struct OutdoorDaten {
 
 void initESPNow();
 OutdoorDaten getOutdoorDaten();
-bool outdoorVerbunden(unsigned long timeoutMs = 30000); // true wenn Daten < 30s alt
+bool outdoorVerbunden(unsigned long timeoutMs = OUTDOOR_TIMEOUT_MS); // true wenn Daten < 30s alt

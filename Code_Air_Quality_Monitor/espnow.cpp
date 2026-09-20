@@ -1,4 +1,7 @@
 #include "espnow.h"
+#include "utils.h"
+#include "config.h"
+
 #include <WiFi.h>
 #include <esp_now.h>
 
@@ -21,6 +24,7 @@ static void onDataRecv(const esp_now_recv_info_t* info, const uint8_t* data, int
     outdoorDaten.letzterEmpfang = millis();
     Serial.printf("ESP-NOW empfangen: Temp=%.1f°C  Hum=%.1f%%  Druck=%.1fhPa\n",
                   paket.temp, paket.hum, paket.pressure);
+    updatePressureTrend(calcPressureAMSL( paket.pressure, paket.temp, h_AMSL));              
 }
 
 void initESPNow() {

@@ -7,6 +7,7 @@ This is a guide to build your own Air-Quality-Monitor (**AQM**). The AQM measure
 - [Parts](#parts)
 - [Assembly](#assembly)
 - [Installation](#installation)
+- [Settings](#settings)
 - [Display Layout](#display-layout)
 - [Price](#price)
 - [Extension](#extension)
@@ -30,6 +31,10 @@ To assembel the AQM you should first start with testing all the components on a 
 
 After wiring up all components you just need to download the Code and flash it to the ESP32 using the Arduino IDE or similar programms. 
 
+# Settings
+
+All different settings can be changed in the "config.h" file. 
+
 # Display Layout
 
 The AQM can either be used in a vertical or horizontal configuration. For that you can change 'ORIENTATION' in the config file to either 0 (vertical) or 1 (horizontal).
@@ -52,6 +57,7 @@ The AQM can either be used in a vertical or horizontal configuration. For that y
 
 \* All parts sourced on Aliexpress Mai 2026
 
+<div align="left">
 # Extension
 
 When connected with the [AQM-Outdoor-Add-On](https://github.com/Oliver-Bosch/AQM-Outdoor-Add-On) a new tile will appear in the lower bar and give additional informations for the outside temperature, humidity and air pressure. With this information the ventilation logic and weather prediction is feed.
