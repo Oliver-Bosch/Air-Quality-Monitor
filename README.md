@@ -1,6 +1,8 @@
 # Air-Quality-Monitor
 
-This is a guide to build your own Air-Quality-Monitor (**AQM**). The AQM measures CO2, relative humidity, temperature, TVOC and particulate matter. The current readings are displayed on a 4-inch TFT screen. The device is connected to the local network via Wi-Fi to synchronise time.
+This is a guide to build your own Air-Quality-Monitor (**AQM**). The AQM measures CO2, relative humidity, temperature and particulate matter. The current readings are displayed on a 4-inch TFT screen. The device is connected to the local network via Wi-Fi to synchronise time.
+
+![Image of the AQM](Images/AQM.png)
 
 # Table of Contents
 
@@ -8,9 +10,7 @@ This is a guide to build your own Air-Quality-Monitor (**AQM**). The AQM measure
 - [Assembly](#assembly)
 - [Installation](#installation)
 - [Settings](#settings)
-- [Display Layout](#display-layout)
 - [Price](#price)
-- [Extension](#extension)
 - [Notes](#notes)
 
 # Parts
@@ -25,7 +25,7 @@ This is a guide to build your own Air-Quality-Monitor (**AQM**). The AQM measure
 
 # Assembly
 
-To assembel the AQM you should first start with testing all the components on a bredboard which are connected as in figure X. After checking the functinality of all components and printing the body of the case you start by soldering the components to each other as shown in figure Y. Start with screwing the TFT display in place (depending on screw length you have to use washers/springs). After that place the SPS30 in the lower corner with the connector facing the dividing wall of the case. Then you can screw in the [Sensor for TVOC] and SHT40 into their respectiv mounting holes. The SCD41 is mounted using a wedge because of the missing mounting holes. At last step mount the VEML7700 with the pins facing inside and then close the lid of the AQM.
+To assembel the AQM you should first start with testing all the components on a bredboard which are connected as in figure X. After checking the functinality of all components and printing the body of the case you start by soldering the components to each other as shown in figure Y. Start with screwing the TFT display in place (depending on screw length you have to use washers/springs). After that place the SPS30 in the lower corner with the connector facing the dividing wall of the case. Then you can screw in the SHT40 into its respectiv mounting holes. The SCD41 is mounted using a wedge because of the missing mounting holes. At last step mount the VEML7700 with the pins facing inside and then close the lid of the AQM.
 
 # Installation
 
@@ -34,11 +34,6 @@ After wiring up all components you just need to download the Code and flash it t
 # Settings
 
 All different settings can be changed in the "config.h" file. 
-
-# Display Layout
-
-The AQM can either be used in a vertical or horizontal configuration. For that you can change 'ORIENTATION' in the config file to either 0 (vertical) or 1 (horizontal).
-
 
 
 # Price
@@ -58,9 +53,6 @@ The AQM can either be used in a vertical or horizontal configuration. For that y
 \* All parts sourced on Aliexpress Mai 2026
 
 <div align="left">
-# Extension
-
-When connected with the [AQM-Outdoor-Add-On](https://github.com/Oliver-Bosch/AQM-Outdoor-Add-On) a new tile will appear in the lower bar and give additional informations for the outside temperature, humidity and air pressure. With this information the ventilation logic and weather prediction is feed.
 
 # Notes
 
