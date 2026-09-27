@@ -2,7 +2,7 @@
 
 This is a guide to build your own Air-Quality-Monitor (**AQM**). The AQM measures CO2, relative humidity, temperature and particulate matter. The current readings are displayed on a 4-inch TFT screen. The device is connected to the local network via Wi-Fi to synchronise time.
 
-![Image of the AQM](Images/AQM.png)
+<img src="Images/AQM.png" alt="Image of the AQM" width="66.67%">
 
 # Table of Contents
 
