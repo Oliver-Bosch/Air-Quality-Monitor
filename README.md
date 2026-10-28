@@ -27,7 +27,7 @@ This is a guide to build your own Air-Quality-Monitor (**AQM**). The AQM measure
 
 # Assembly
 
-To assembel the AQM you should first start with testing all the components on a bredboard which are connected as in figure X. After checking the functinality of all components and printing the body of the case you start by soldering the components to each other as shown in figure Y. Start with screwing the TFT display in place (depending on screw length you have to use washers/springs). After that place the SPS30 in the lower corner with the connector facing the dividing wall of the case. Then you can screw in the SHT40 into its respectiv mounting holes. The SCD41 is mounted using a wedge because of the missing mounting holes. At last step mount the VEML7700 with the pins facing inside and then close the lid of the AQM.
+To assembel the AQM you should first start with testing all the components on a bredboard which are connected as in figure 2. After checking the functinality of all components and printing the body of the case you start by soldering the components to each other as shown before. Start with screwing the TFT display in place (depending on screw length you have to use washers/springs). After that place the SPS30 in the lower corner with the connector facing the dividing wall of the case. Then you can screw in the SHT40 into its respectiv mounting holes. The SCD41 is mounted using a wedge because of the missing mounting holes. At last step mount the VEML7700 with the pins facing inside and then close the lid of the AQM.
 
 # Installation
 
